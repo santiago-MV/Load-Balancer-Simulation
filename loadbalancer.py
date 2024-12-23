@@ -1,8 +1,8 @@
 import math
-import random
+
 
 import random as r
-from traceback import print_tb
+
 
 import matplotlib.pyplot as plt
 import math as m
@@ -87,7 +87,7 @@ def loadbalancer(error): #If a Heavy query is executed it will stay on the CPU t
         transitionaryState = False
     if abs(error) > 25:
         if not transitionaryState:
-            print("El sistema llego al estado de fallo! Abortando...")
+            print("The system has reached failure! Aborting...")
             return 1
     if 15 <= abs(error) <= 25:# Need to add or delete a CPU
         totalError = error * len(CPUs) # Total excess
@@ -97,14 +97,14 @@ def loadbalancer(error): #If a Heavy query is executed it will stay on the CPU t
             for x in range(abs(CPUdifference)):
                 if len(CPUs) > minCPUAmount:
                     CPUs.pop()
-                else: #print("Minimum CPU amount of  ("+ str(minCPUAmount) +") reached! no more CPUs will be deactivated");
+                else: print("Minimum CPU amount of  ("+ str(minCPUAmount) +") reached! no more CPUs will be deactivated");
                     break
         else:
             for x in range(abs(CPUdifference)):
                 if len(CPUs) < maxCPUAmount:
                     newCPU = CPU(0,0,0)
                     CPUs.append(newCPU)
-                else: #print("Maximum CPU amount of  ("+ str(maxCPUAmount) +") reached! no more CPUs will be activated");
+                else: print("Maximum CPU amount of  ("+ str(maxCPUAmount) +") reached! no more CPUs will be activated");
                     break
         CPURequest = requestForCPU(ActiveRequests) # Divide the request between the new amount of CPUs
         refreshCPUs(CPURequest,Perturbation(0,0))
@@ -123,7 +123,7 @@ while t<iterationAmount:
 
     if (not transitionaryState) & (r.random() < perturbationChance):
         perturbation = Perturbation(math.ceil(r.random()*maxPerturbation),math.ceil(r.random()*perturbationTTL))
-        print('Se produjo una perturbacion, TTL: '+str(perturbation.TTL)+' valor: '+str(perturbation.requests) +' Mips')
+        print('A perturbation has occurred, TTL: '+str(perturbation.TTL)+' Value: '+str(perturbation.requests) +' Mips')
     else:
         perturbation = Perturbation(0,0)
     # Generate the incoming requests in this t
@@ -158,54 +158,54 @@ while t<iterationAmount:
 
 
 
-    print('Cantidad de servidores: ' + str(len(CPUs)) + ' - Porcentaje de uso: ' + str(round(CPUs[0].usage*100,2)) + '% - Señal de error: ' + str(round(calculatedError,2)))
-    print('Request entrantes: ' + str(req) + ' Mips por servidor - Request eliminadas: ' + str(deletedRequest)+' Mips por servidor')
+    print('Server amount: ' + str(len(CPUs)) + ' - Usage percentage: ' + str(round(CPUs[0].usage*100,2)) + '% - Error signal: ' + str(round(calculatedError,2)))
+    print('New requests: ' + str(req) + ' Mips per Server - Deleted request: ' + str(deletedRequest)+' Mips per Server')
 
     print('=======================================================================================')
     t += 1
 # CPU Usage
 custom_ticks = [0,25,35,50,65,75,100]
 plt.figure(figsize=(20, 6))
-plt.plot(time, usage, label="Uso del CPU [%]", color="blue", linewidth=0.5)
+plt.plot(time, usage, label="CPU usage [%]", color="blue", linewidth=0.5)
 plt.axhline(y=50, color='green', linestyle='-', linewidth=0.75)
 plt.axhline(y=65, color='blue', linestyle='--', linewidth=0.75)
 plt.axhline(y=35, color='blue', linestyle='--', linewidth=0.75)
 plt.axhline(y=75, color='red', linestyle=':', linewidth=0.75)
 plt.axhline(y=25, color='red', linestyle=':', linewidth=0.75)
-plt.title("Uso del CPU en el tiempo")
-plt.xlabel("Tiempo [seg]")
+plt.title("CPU usage through time")
+plt.xlabel("Time [seg]")
 plt.ylim(0, 1)
 plt.yticks(custom_ticks)
-plt.ylabel("Uso del CPU [%]")
+plt.ylabel("CPU usage [%]")
 plt.grid(True)
 plt.legend()
 plt.show()
 # CPU amount
 plt.figure(figsize=(20, 6))
-plt.plot(time, lengths, label="Cantidad de CPUs", color="green")
+plt.plot(time, lengths, label="CPUs amount", color="green")
 plt.xlabel("Tiempo [seg]")
 plt.ylim(0, maxCPUAmount + 2)
-plt.ylabel("Número de CPUs activas [Unidades]")
-plt.title("Variación de CPUs en el tiempo")
+plt.ylabel("Active CPU [Units]")
+plt.title("CPU amount through time")
 plt.grid(True)
 plt.legend()
 plt.show()
 # Requests and perturbations
 plt.figure(figsize=(20, 6))
-plt.plot(time, requestsList, label="Cantidad de requests", color="blue")
+plt.plot(time, requestsList, label="Request amount", color="blue")
 plt.xlabel("Tiempo [seg]")
 plt.ylim(0, maxRequestPerCPU+1)
-plt.ylabel("Cantidad")
-plt.title("Requests en el tiempo")
+plt.ylabel("Amount")
+plt.title("Requests through time")
 plt.grid(True)
 plt.legend()
 plt.show()
 # Perturbations
 plt.figure(figsize=(20, 6))
-plt.plot(time, perturbations, label="Cantidad de requests de perturbaciones", color="red")
-plt.xlabel("Tiempo [seg]")
-plt.ylabel("Cantidad de request de las perturbaciones")
-plt.title("Perturbaciones en el tiempo")
+plt.plot(time, perturbations, label="Perturbation amount", color="red")
+plt.xlabel("Time [seg]")
+plt.ylabel("Value of the perturbations")
+plt.title("Perturbaciones through time")
 plt.grid(True)
 plt.legend()
 plt.show()
