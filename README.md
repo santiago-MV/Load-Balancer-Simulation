@@ -21,4 +21,4 @@ Follow these steps to run the Cloud Server Load Balancer Simulation on your loca
 4. **Run the simulation**
     ```bash
     python loadbalancer.py
-5. **Observe the simulation:** The simulation will terminate either after completing the number of iterations specified in the config.ini file or upon reaching a failure state. A failure occurs if the CPU usage deviates by more than 25% from the desired value and the system is unable to assign or remove CPUs to correct it.
+5. **Observe the simulation:** The simulation will terminate either after completing the number of iterations specified in the `config.ini` file or upon reaching a failure state. A failure occurs if the CPU usage deviates by more than 25% from the desired value and the system is unable to assign or remove CPUs to correct it.
