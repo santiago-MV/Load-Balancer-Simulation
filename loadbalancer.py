@@ -1,27 +1,34 @@
-import math
-
-
-import random as r
-
-
 import matplotlib.pyplot as plt
+import random as r
 import math as m
+import configparser as c
 
-respuestaValorNominal = 50
-maxPowerConsumption = 575
-maxSpeed = 3.1 # In Ghz
-perturbationChance = 0.1
-maxPerturbation = 100
-perturbationTTL = 3
-CPUAmount = 5
-iterationAmount = 500
-minCPUAmount = 1
-maxCPUAmount = 8
-maxRequestPerCPU = 3100
-maxRPS = 0.25*maxRequestPerCPU # In Mips
+# Load the config file
+config = c.ConfigParser()
+config.read('config.ini')
+
+nominalValue = int(config['user_input']['cpuUsage'])
+
+maxPowerConsumption = int(config['CPU_config']['maxPowerConsumption'])
+maxSpeed = float(config['CPU_config']['maxSpeed']) # In Ghz
+CPUAmount = int(config['CPU_config']['CPUInitialAmount'])
+minCPUAmount = int(config['CPU_config']['CPUMinAmount'])
+maxCPUAmount = int(config['CPU_config']['CPUMaxAmount'])
+maxRequestPerCPU = int(config['CPU_config']['maxRequestPerCPU'])
+
+perturbationChance = float(config['perturbation_config']['perturbationChance'])
+maxPerturbation = int(config['perturbation_config']['maxValueOfPerturbation'])
+perturbationTTL = int(config['perturbation_config']['perturbationTTL'])
+
+iterationAmount = int(config['simulation_config']['iterationAmount'])
+
+RPSpercentage = float(config['request_config']['percentageOfRequestGenerated'])
+maxRPS = RPSpercentage*maxRequestPerCPU # In Mips
+#
 t=0
 error = 0
 transitionaryState = True
+# Lists for graphs
 usage = []
 requests = []
 time = []
@@ -91,20 +98,22 @@ def loadbalancer(error): #If a Heavy query is executed it will stay on the CPU t
             return 1
     if 15 <= abs(error) <= 25:# Need to add or delete a CPU
         totalError = error * len(CPUs) # Total excess
-        CPUdifference = m.ceil(abs(totalError)/input)# The amount of CPUs to add or delete
+        CPUdifference = m.ceil(abs(totalError)/nominalValue)# The amount of CPUs to add or delete
         ActiveRequests = totalRequests() # The total amount of active requests
         if error>0: # Need to delete a CPU
             for x in range(abs(CPUdifference)):
                 if len(CPUs) > minCPUAmount:
                     CPUs.pop()
-                else: print("Minimum CPU amount of  ("+ str(minCPUAmount) +") reached! no more CPUs will be deactivated");
+                else:
+                    print("Minimum CPU amount of  ("+ str(minCPUAmount) +") reached! no more CPUs will be deactivated")
                     break
         else:
             for x in range(abs(CPUdifference)):
                 if len(CPUs) < maxCPUAmount:
                     newCPU = CPU(0,0,0)
                     CPUs.append(newCPU)
-                else: print("Maximum CPU amount of  ("+ str(maxCPUAmount) +") reached! no more CPUs will be activated");
+                else:
+                    print("Maximum CPU amount of  ("+ str(maxCPUAmount) +") reached! no more CPUs will be activated")
                     break
         CPURequest = requestForCPU(ActiveRequests) # Divide the request between the new amount of CPUs
         refreshCPUs(CPURequest,Perturbation(0,0))
@@ -122,7 +131,7 @@ while t<iterationAmount:
     # Perturbations that occur because of a spike in the need of CPU usage by  are randomly generated
 
     if (not transitionaryState) & (r.random() < perturbationChance):
-        perturbation = Perturbation(math.ceil(r.random()*maxPerturbation),math.ceil(r.random()*perturbationTTL))
+        perturbation = Perturbation(m.ceil(r.random()*maxPerturbation),m.ceil(r.random()*perturbationTTL))
         print('A perturbation has occurred, TTL: '+str(perturbation.TTL)+' Value: '+str(perturbation.requests) +' Mips')
     else:
         perturbation = Perturbation(0,0)
@@ -139,7 +148,7 @@ while t<iterationAmount:
 
     # Error signal
     previousError = error
-    error = (input) - (CPUs[0].usage*100) # All CPUs Have the same usage, this represents the excess of usage in each CPU
+    error = (nominalValue) - (CPUs[0].usage*100) # All CPUs Have the same usage, this represents the excess of usage in each CPU
     proportionalError = kp*error
 
     derivativeError = kd*(error-previousError)
@@ -179,6 +188,7 @@ plt.yticks(custom_ticks)
 plt.ylabel("CPU usage [%]")
 plt.grid(True)
 plt.legend()
+plt.savefig("graphs/CPU_Usage.png")
 plt.show()
 # CPU amount
 plt.figure(figsize=(20, 6))
@@ -189,8 +199,9 @@ plt.ylabel("Active CPU [Units]")
 plt.title("CPU amount through time")
 plt.grid(True)
 plt.legend()
+plt.savefig("graphs/CPU_Amount.png")
 plt.show()
-# Requests and perturbations
+# Requests
 plt.figure(figsize=(20, 6))
 plt.plot(time, requestsList, label="Request amount", color="blue")
 plt.xlabel("Tiempo [seg]")
@@ -199,13 +210,15 @@ plt.ylabel("Amount")
 plt.title("Requests through time")
 plt.grid(True)
 plt.legend()
+plt.savefig("graphs/Requests.png")
 plt.show()
 # Perturbations
 plt.figure(figsize=(20, 6))
 plt.plot(time, perturbations, label="Perturbation amount", color="red")
 plt.xlabel("Time [seg]")
-plt.ylabel("Value of the perturbations")
-plt.title("Perturbaciones through time")
+plt.ylabel("Value of perturbations")
+plt.title("Perturbations through time")
 plt.grid(True)
 plt.legend()
+plt.savefig("graphs/Perturbation.png")
 plt.show()

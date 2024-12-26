@@ -16,6 +16,9 @@ Follow these steps to run the Cloud Server Load Balancer Simulation on your loca
 2. **Install the required dependency:**
     ```bash
     pip install matplotlib
-3. **Run the simulation**
+3. **Configure the simulation:**
+    Customize the parameters of the load balancer by editing the `config.ini` file. Open it in any text editor and adjust the settings to your preferences.
+4. **Run the simulation**
     ```bash
     python loadbalancer.py
+5. **Observe the simulation:** The simulation will terminate either after completing the number of iterations specified in the config.ini file or upon reaching a failure state. A failure occurs if the CPU usage deviates by more than 25% from the desired value and the system is unable to assign or remove CPUs to correct it.
